@@ -1,4 +1,4 @@
-module github.com/meta-boy/atsumaru.git
+module github.com/someshkoli/tunnel
 
 go 1.15
 
