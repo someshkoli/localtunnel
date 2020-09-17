@@ -1,46 +1,80 @@
 package schema
 
-import "net/http"
+import (
+	"net/http"
+)
 
+// Status - Connection status
 type Status string
 
 const (
 	// Initializing the connection
-	Initializing string = "Initializing"
+	Initializing Status = "Initializing"
 	// Connected to the tunnel
-	Connected string = "Connected"
+	Connected Status = "Connected"
+	// MaxDataSize - Maximum data transfer size
+	MaxDataSize = 8192
 )
 
 // Request - incomming request
 type Request struct {
-	ID         string
-	ClientAddr string
-	Rhost      string
-	Lhost      string
-	Lport      int
-	Rport      int
-	Request    *http.Request
+	ConnectionStatus Status
+	ID               string
+	Rhost            string
+	Lhost            string
+	Lport            int
+	Rport            int
+	Request          http.Request
 }
 
 // Response - Outgoing response
 type Response struct {
-	ID         string
-	ClientAddr string
-	Rhost      string
-	Lhost      string
-	Lport      int
-	Rport      int
-	response   http.ResponseWriter
+	ConnectionStatus Status
+	ID               string
+	ClientAddr       string
+	Rhost            string
+	Lhost            string
+	Lport            int
+	Rport            int
+	Response         http.Response
 }
 
-// MessageOut - Message to be send via connection
-type MessageOut struct {
-	ConnectionStatus Status
-	data             *Response
+// MakeRequest - Returns instance for a request
+func MakeRequest(
+	status Status,
+	id string,
+	rhost string,
+	rport int,
+	lhost string,
+	lport int,
+	req http.Request) Request {
+	request := Request{}
+	request.ConnectionStatus = status
+	request.ID = id
+	request.Rhost = rhost
+	request.Lhost = lhost
+	request.Rport = rport
+	request.Lport = lport
+	request.Request = req
+	return request
 }
 
-// MessageIn - Mesaage to be recieved via connection
-type MessageIn struct {
-	ConnectionStatus Status
-	data             *Response
+// MakeResponse - Creates new Instance for
+func MakeResponse(
+	status Status,
+	id string,
+	rhost string,
+	rport int,
+	lhost string,
+	lport int,
+	res http.Response) Response {
+	response := Response{}
+	response.ConnectionStatus = status
+	response.ID = id
+	response.Lhost = lhost
+	response.Lport = lport
+	response.Rhost = rhost
+	response.Rport = rport
+	response.Response = res
+	return response
 }
