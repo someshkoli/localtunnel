@@ -22,10 +22,8 @@ const (
 // Connection - instance for new tunnel connection
 type Connection struct {
 	ID      string   `json:"ID"`
-	Lhost   string   `json:"Lhost"`
-	Lport   int      `json:"Lport"`
-	Rhost   string   `json:"Rhost"`
-	Rport   int      `json:"Rport"`
+	Host    string   `json:"Host"`
+	Port    int      `json:"Port"`
 	Conn    net.Conn `json:"Conn"`
 	send    chan *schema.Request
 	receive chan schema.Response
@@ -34,13 +32,11 @@ type Connection struct {
 }
 
 // MakeConnection - Returns new instance for the connection
-func MakeConnection(lhost string, lport int, rhost string, rport int) Connection {
+func MakeConnection(host string, port int) Connection {
 	connection := Connection{
-		ID:    uuid.New().String(),
-		Rhost: rhost,
-		Rport: rport,
-		Lhost: lhost,
-		Lport: lport,
+		ID:   uuid.New().String(),
+		Host: host,
+		Port: port,
 	}
 	connection.Status = Open
 	connection.send = make(chan *schema.Request)
