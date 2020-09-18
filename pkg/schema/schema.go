@@ -21,9 +21,8 @@ type Request struct {
 	ConnectionStatus Status
 	ID               string
 	Rhost            string
-	Lhost            string
-	Lport            int
-	Rport            int
+	Host             string
+	Port             int
 	Request          http.Request
 }
 
@@ -32,10 +31,8 @@ type Response struct {
 	ConnectionStatus Status
 	ID               string
 	ClientAddr       string
-	Rhost            string
-	Lhost            string
-	Lport            int
-	Rport            int
+	Host             string
+	Port             int
 	Response         http.Response
 }
 
@@ -43,18 +40,14 @@ type Response struct {
 func MakeRequest(
 	status Status,
 	id string,
-	rhost string,
-	rport int,
-	lhost string,
-	lport int,
+	host string,
+	port int,
 	req http.Request) Request {
 	request := Request{}
 	request.ConnectionStatus = status
 	request.ID = id
-	request.Rhost = rhost
-	request.Lhost = lhost
-	request.Rport = rport
-	request.Lport = lport
+	request.Host = host
+	request.Port = port
 	request.Request = req
 	return request
 }
@@ -63,18 +56,14 @@ func MakeRequest(
 func MakeResponse(
 	status Status,
 	id string,
-	rhost string,
-	rport int,
-	lhost string,
-	lport int,
+	host string,
+	port int,
 	res http.Response) Response {
 	response := Response{}
 	response.ConnectionStatus = status
 	response.ID = id
-	response.Lhost = lhost
-	response.Lport = lport
-	response.Rhost = rhost
-	response.Rport = rport
+	response.Host = host
+	response.Port = port
 	response.Response = res
 	return response
 }
