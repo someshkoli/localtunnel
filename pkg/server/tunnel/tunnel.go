@@ -46,7 +46,7 @@ func (tunnel *Tunnel) Listen() {
 		}
 		// initializing first request to register the tunnel
 		// sending uid with initilizing status
-		message := schema.MakeRequest(schema.Initializing, getUID(), "", 0, "", 0, http.Request{})
+		message := schema.MakeRequest(schema.Initializing, getUID(), "", 0, http.Request{})
 		tempBuffer := new(bytes.Buffer)
 		gob.NewEncoder(tempBuffer).Encode(message)
 		conn.Write(tempBuffer.Bytes())
@@ -54,15 +54,18 @@ func (tunnel *Tunnel) Listen() {
 		// receiving initial data about localhost
 		bufferResponse := make([]byte, schema.MaxDataSize)
 		_, err = conn.Read(bufferResponse)
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
 		bufferResponseCollector := bytes.NewBuffer(bufferResponse)
-		tempResponse := new(schema.Response)
-		gob.NewDecoder(bufferResponseCollector).Decode(tempResponse)
+		initialResponse := new(schema.Response)
+		gob.NewDecoder(bufferResponseCollector).Decode(initialResponse)
 
 		// creating new connection and registering nat for this uid
-		connection := MakeConnection(tempResponse.Lhost, tempResponse.Lport, tempResponse.Rhost, tempResponse.Rport)
+		connection := MakeConnection(initialResponse.Host, initialResponse.Port)
 		connection.Conn = conn
-		tunnel.Nat[message.ID] = &connection
-
+		tunnel.Nat[initialResponse.ID] = &connection
 		// running this connection through routine
 		go connectionHandler(&connection)
 	}
