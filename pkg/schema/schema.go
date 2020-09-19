@@ -1,6 +1,10 @@
 package schema
 
 import (
+	"bytes"
+	"encoding/gob"
+	"fmt"
+	"net"
 	"net/http"
 )
 
@@ -66,4 +70,26 @@ func MakeResponse(
 	response.Port = port
 	response.Response = res
 	return response
+}
+
+// SendMessage - Sends message via tcp connection
+func SendMessage(conn net.Conn, res *Response) {
+	messageBuffer := new(bytes.Buffer)
+	gob.NewEncoder(messageBuffer).Encode(res)
+	conn.Write(messageBuffer.Bytes())
+	fmt.Println("messageSent")
+}
+
+// ReceiveMessage - Recieves single incomming message tcp connection
+func ReceiveMessage(conn net.Conn) (*Request, error) {
+	requestBuffer := make([]byte, MaxDataSize)
+	_, err := conn.Read(requestBuffer)
+	if err != nil {
+		fmt.Println(err)
+		return &Request{}, err
+	}
+	bufferRequestCollector := bytes.NewBuffer(requestBuffer)
+	request := new(Request)
+	gob.NewDecoder(bufferRequestCollector).Decode(request)
+	return request, nil
 }
