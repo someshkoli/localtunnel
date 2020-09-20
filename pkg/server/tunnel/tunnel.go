@@ -36,13 +36,12 @@ func MakeTunnel(port int) (Tunnel, error) {
 }
 
 // Listen - Starts accepting connections
-func (tunnel *Tunnel) Listen() {
+func (tunnel *Tunnel) Listen() error {
 	defer tunnel.Listner.Close()
 	for {
 		conn, err := tunnel.Listner.Accept()
 		if err != nil {
-			fmt.Println(err)
-			continue
+			panic(err)
 		}
 		// initializing first request to register the tunnel
 		// sending uid with initilizing status
@@ -55,8 +54,7 @@ func (tunnel *Tunnel) Listen() {
 		bufferResponse := make([]byte, schema.MaxDataSize)
 		_, err = conn.Read(bufferResponse)
 		if err != nil {
-			fmt.Println(err)
-			break
+			panic(err)
 		}
 		bufferResponseCollector := bytes.NewBuffer(bufferResponse)
 		initialResponse := new(schema.Response)
@@ -68,6 +66,7 @@ func (tunnel *Tunnel) Listen() {
 		tunnel.Nat[initialResponse.ID] = &connection
 		// running this connection through routine
 		go connectionHandler(&connection)
+		connection.Status = Closed
 	}
 }
 
